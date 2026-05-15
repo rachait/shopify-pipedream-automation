@@ -48,3 +48,40 @@ YES ----------------→ Send Welcome Email
                     Send Discount Email
 
 NO -----------------→ Stop Workflow
+
+
+```
+# Technologies Used
+- Pipedream
+- Node.js
+- Shopify Webhooks
+- Gmail API
+
+# Node.js Validation Logic
+export default defineComponent({
+  async run({ steps, $ }) {
+
+    const order = steps.trigger.event.body || {};
+
+    if (!order.customer) {
+      $.flow.exit("No valid Shopify order payload received");
+    }
+
+    const orderTags = order.tags || "";
+    const customerTags = order.customer?.tags || "";
+    const totalAmount = parseFloat(order.total_price || 0);
+
+    const hasOrderTag = orderTags.includes("MakeOrder");
+    const hasCustomerTag = customerTags.includes("ColdCustomer");
+    const amountValid = totalAmount > 2500;
+
+    if (!(hasOrderTag && hasCustomerTag && amountValid)) {
+      $.flow.exit("Conditions not satisfied");
+    }
+
+    return {
+      customerEmail: order.email || "customer@example.com",
+      totalAmount
+    };
+  }
+});
