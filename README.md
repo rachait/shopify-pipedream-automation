@@ -48,43 +48,111 @@ YES ----------------→ Send Welcome Email
                     Send Discount Email
 
 NO -----------------→ Stop Workflow
-
-
 ```
-# Technologies Used
+
+---
+
+## Technologies Used
+
 - Pipedream
 - Node.js
 - Shopify Webhooks
 - Gmail API
 
-# Node.js Validation Logic
+---
+
+## Shopify Webhook Payload Example
+
+```json
+{
+  "tags": "MakeOrder",
+  "total_price": "3500",
+  "email": "customer@example.com",
+  "customer": {
+    "tags": "ColdCustomer"
+  }
+}
+```
+
+---
+
+## Node.js Validation Logic
+
+```javascript
 export default defineComponent({
   async run({ steps, $ }) {
+
     const order = steps.trigger.event.body || {};
+
     if (!order.customer) {
       $.flow.exit("No valid Shopify order payload received");
     }
+
     const orderTags = order.tags || "";
     const customerTags = order.customer?.tags || "";
     const totalAmount = parseFloat(order.total_price || 0);
+
     const hasOrderTag = orderTags.includes("MakeOrder");
     const hasCustomerTag = customerTags.includes("ColdCustomer");
     const amountValid = totalAmount > 2500;
+
     if (!(hasOrderTag && hasCustomerTag && amountValid)) {
       $.flow.exit("Conditions not satisfied");
     }
+
     return {
       customerEmail: order.email || "customer@example.com",
       totalAmount
     };
   }
 });
+```
 
-# Email Automation
-Immediate Email
+---
+
+## Email Automation
+
+### Immediate Email
 - Sent immediately after successful validation
 - Welcomes the customer and confirms order receipt
-Delayed Email
+
+### Delayed Email
 - Sent after 5 minutes
 - Notifies the customer about an unlocked discount
 
+---
+
+## Deployment Link
+
+```text
+https://eok0q9z4kt0qb9r.m.pipedream.net
+```
+
+---
+
+## Repository Structure
+
+```text
+/images
+README.md
+workflow-screenshots
+```
+
+---
+
+## Screenshots Included
+
+- Workflow Overview
+- HTTP Trigger
+- Node.js Logic
+- Gmail Email Step 1
+- Delay Step
+- Gmail Email Step 2
+- Successful Workflow Execution
+- Deployment Screen
+
+---
+
+## Author
+
+**Rachait Talwar**
