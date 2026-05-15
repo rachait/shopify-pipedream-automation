@@ -60,28 +60,31 @@ NO -----------------→ Stop Workflow
 # Node.js Validation Logic
 export default defineComponent({
   async run({ steps, $ }) {
-
     const order = steps.trigger.event.body || {};
-
     if (!order.customer) {
       $.flow.exit("No valid Shopify order payload received");
     }
-
     const orderTags = order.tags || "";
     const customerTags = order.customer?.tags || "";
     const totalAmount = parseFloat(order.total_price || 0);
-
     const hasOrderTag = orderTags.includes("MakeOrder");
     const hasCustomerTag = customerTags.includes("ColdCustomer");
     const amountValid = totalAmount > 2500;
-
     if (!(hasOrderTag && hasCustomerTag && amountValid)) {
       $.flow.exit("Conditions not satisfied");
     }
-
     return {
       customerEmail: order.email || "customer@example.com",
       totalAmount
     };
   }
 });
+
+# Email Automation
+Immediate Email
+- Sent immediately after successful validation
+- Welcomes the customer and confirms order receipt
+Delayed Email
+- Sent after 5 minutes
+- Notifies the customer about an unlocked discount
+
